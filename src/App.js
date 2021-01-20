@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
 import Draggable from './components/draggable';
@@ -29,6 +29,7 @@ const todoTest = [
 
 function App() {
   const [todoList, setTodoList] = useState(todoTest);
+  const startIndex = useRef(-1);
 
   const setTodo = useCallback(
     (value, index) => {
@@ -41,18 +42,65 @@ function App() {
     [todoList]
   );
 
+  const handleStart = useCallback((index) => {
+    startIndex.current = index;
+  }, []);
+
+  const handleEnd = useCallback((index) => {
+    startIndex.current = -1;
+  }, []);
+
   const swapTodos = useCallback(
-    (start, end) => {
-      const mapped = todoList.map((val, idx, arr) => {
-        if (idx === start) {
-          return arr[end];
-        }
-        if (idx === end) {
-          return arr[start];
-        }
-        return val;
-      });
-      setTodoList(mapped);
+    (index) => {
+      console.log(startIndex, index);
+
+      const { reducedList } = todoList.reduce(
+        (prev, cur, idx, arr) => {
+          if (idx === startIndex.current) {
+            return prev;
+          }
+
+          if (idx === index) {
+            prev.reducedList.push(arr[startIndex.current]);
+            return prev;
+          }
+
+          prev.reducedList.push(cur);
+          return prev;
+        },
+        { reducedList: [] }
+      );
+
+      setTodoList(reducedList);
+    },
+    [todoList]
+  );
+
+  const insertSpace = useCallback(
+    (index) => {
+      console.log(`from ${startIndex.current} to ${index}`);
+
+      if (index === startIndex.current || index === startIndex.current + 1) {
+        return;
+      }
+
+      if (todoList[index].isSpace) {
+        return;
+      }
+
+      const filtered = todoList.filter((todo) => !todo.isSpace);
+
+      const front = filtered.slice(0, index);
+      const back = filtered.slice(index);
+
+      console.log(filtered.length, todoList.length);
+      if (index < startIndex.current) {
+        startIndex.current += 1;
+      } else if (filtered.length < todoList.length) {
+        startIndex.current += 1;
+      }
+
+      setTodoList([...front, { id: '123123', text: '', isSpace: true }, ...back]);
     },
     [todoList]
   );
@@ -63,9 +111,18 @@ function App() {
     }
 
     return todoList.map(({ id, text }, idx) => (
-      <Box key={id} index={idx} value={text} onChange={setTodo} onSwap={swapTodos} />
+      <Box
+        key={id}
+        index={idx}
+        value={text}
+        onChange={setTodo}
+        onSwap={swapTodos}
+        onSpace={insertSpace}
+        onStart={handleStart}
+        onEnd={handleEnd}
+      />
     ));
-  }, [todoList, setTodo, swapTodos]);
+  }, [todoList, setTodo, swapTodos, insertSpace, handleStart, handleEnd]);
 
   return (
     <Container>
