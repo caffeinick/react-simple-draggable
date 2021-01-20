@@ -47,14 +47,8 @@ function App() {
     [dragList]
   );
 
-  const handleStart = useCallback((index) => {
+  const handleDragStart = useCallback((index) => {
     startIndex.current = index;
-  }, []);
-
-  const handleEnd = useCallback(() => {
-    startIndex.current = -1;
-    leave.current = -1;
-    over.current = -1;
   }, []);
 
   const setInDraggingList = useCallback(() => {
@@ -66,7 +60,7 @@ function App() {
         }
 
         if (idx === over.current) {
-          prev.reducedList.push({ id: '123123123', text: '' });
+          prev.reducedList.push({ ...arr[leave.current] });
           return prev;
         }
 
@@ -79,7 +73,7 @@ function App() {
     setDragList(reducedList);
   }, [dragList]);
 
-  const handleOver = useCallback(
+  const handleDragOver = useCallback(
     (index) => {
       const indexInt = parseInt(index, 10);
 
@@ -100,18 +94,34 @@ function App() {
   );
 
   const handleDrop = useCallback(() => {
-    console.log(`from ${startIndex.current}, leave ${leave.current}, over ${over.current}`);
+    // console.log(`from ${startIndex.current}, leave ${leave.current}, over ${over.current}`);
 
-    const mapped = dragList.map((cur) => {
-      if (cur.text === '') {
-        return listRef.current[startIndex.current];
-      }
-      return cur;
-    });
+    // 부모 벗어나면 버그 발생
+    // const mapped = dragList.map((cur) => {
+    //   if (cur.text === '') {
+    //     return listRef.current[startIndex.current];
+    //   }
+    //   return cur;
+    // });
 
-    setDragList(mapped);
-    listRef.current = mapped;
-  }, [dragList]);
+    // setDragList(mapped);
+    // listRef.current = mapped;
+    // }, [dragList]);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (e) => {
+      // console.log(e);
+      handleDrop();
+    },
+    [handleDrop]
+  );
+
+  const handleResetFlags = useCallback(() => {
+    startIndex.current = -1;
+    leave.current = -1;
+    over.current = -1;
+  }, []);
 
   const renderBox = useCallback(() => {
     if (dragList.length === 0) {
@@ -124,13 +134,22 @@ function App() {
         index={idx}
         value={text}
         onChange={setTodo}
-        onStart={handleStart}
-        onOver={handleOver}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
         onDrop={handleDrop}
-        onEnd={handleEnd}
+        onReset={handleResetFlags}
       />
     ));
-  }, [dragList, setTodo, handleStart, handleOver, handleDrop, handleEnd]);
+  }, [
+    dragList,
+    setTodo,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDrop,
+    handleResetFlags,
+  ]);
 
   return (
     <Container>
