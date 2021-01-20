@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import styled from 'styled-components';
 
-const Box = ({ index = 0, value = '', onChange = () => {} }) => {
+const Box = ({ index = 0, value = '', onChange = () => {}, onSwap = () => {} }) => {
   const handleChange = useCallback(
     (e) => {
       onChange(e?.target?.value, index);
@@ -9,9 +9,33 @@ const Box = ({ index = 0, value = '', onChange = () => {} }) => {
     [index, onChange]
   );
 
+  const handleDragStart = useCallback(
+    (e) => {
+      e?.dataTransfer?.setData('index', index);
+    },
+    [index]
+  );
+
+  const handleDrop = useCallback(
+    (e) => {
+      onSwap(parseInt(e?.dataTransfer?.getData('index'), 10), index);
+    },
+    [index, onSwap]
+  );
+
   return (
     <BoxContainer>
-      <BoxInput type={'input'} value={value} onChange={handleChange} />
+      <BoxInput
+        type={'input'}
+        id={`box-input-${index}`}
+        value={value}
+        onChange={handleChange}
+        autoComplete={'off'}
+        draggable={true}
+        onDragStart={handleDragStart}
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+      />
     </BoxContainer>
   );
 };
@@ -32,5 +56,5 @@ const BoxInput = styled.input`
   height: 50px;
   border: 0;
   background-color: white;
-  width: 100%;
+  width: 90%;
 `;

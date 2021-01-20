@@ -6,23 +6,23 @@ import Box from './components/box';
 
 const todoTest = [
   {
-    id: 0,
+    id: '0',
     text: '코딩하기',
   },
   {
-    id: 1,
+    id: '1',
     text: '책 읽기',
   },
   {
-    id: 2,
+    id: '2',
     text: '일기 쓰기',
   },
   {
-    id: 3,
+    id: '3',
     text: '병원 예약하기',
   },
   {
-    id: 4,
+    id: '4',
     text: '장 보러 가기',
   },
 ];
@@ -41,15 +41,31 @@ function App() {
     [todoList]
   );
 
+  const swapTodos = useCallback(
+    (start, end) => {
+      const mapped = todoList.map((val, idx, arr) => {
+        if (idx === start) {
+          return arr[end];
+        }
+        if (idx === end) {
+          return arr[start];
+        }
+        return val;
+      });
+      setTodoList(mapped);
+    },
+    [todoList]
+  );
+
   const renderBox = useCallback(() => {
     if (todoList.length === 0) {
       return null;
     }
 
     return todoList.map(({ id, text }, idx) => (
-      <Box key={id} index={idx} value={text} onChange={setTodo} />
+      <Box key={id} index={idx} value={text} onChange={setTodo} onSwap={swapTodos} />
     ));
-  }, [todoList, setTodo]);
+  }, [todoList, setTodo, swapTodos]);
 
   return (
     <Container>
