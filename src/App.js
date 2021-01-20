@@ -28,101 +28,109 @@ const todoTest = [
 ];
 
 function App() {
-  const [todoList, setTodoList] = useState(todoTest);
-  const startIndex = useRef(-1);
+  const [dragList, setDragList] = useState(todoTest);
+
+  const listRef = useRef(todoTest);
+  const startIndex = useRef(-1); // 시작한 인덱스 저장
+  const leave = useRef(-1);
+  const over = useRef(-1);
 
   const setTodo = useCallback(
     (value, index) => {
-      const mapped = todoList.map((val, idx) =>
+      const mapped = dragList.map((val, idx) =>
         idx !== index ? val : { id: val.id, text: value }
       );
 
-      setTodoList(mapped);
+      setDragList(mapped);
+      listRef.current = mapped;
     },
-    [todoList]
+    [dragList]
   );
 
   const handleStart = useCallback((index) => {
     startIndex.current = index;
   }, []);
 
-  const handleEnd = useCallback((index) => {
+  const handleEnd = useCallback(() => {
     startIndex.current = -1;
+    leave.current = -1;
+    over.current = -1;
   }, []);
 
-  const swapTodos = useCallback(
-    (index) => {
-      console.log(startIndex, index);
-
-      const { reducedList } = todoList.reduce(
-        (prev, cur, idx, arr) => {
-          if (idx === startIndex.current) {
-            return prev;
-          }
-
-          if (idx === index) {
-            prev.reducedList.push(arr[startIndex.current]);
-            return prev;
-          }
-
-          prev.reducedList.push(cur);
+  const setInDraggingList = useCallback(() => {
+    const { reducedList } = dragList.reduce(
+      (prev, cur, idx, arr) => {
+        if (idx === leave.current) {
+          prev.reducedList.push(arr[over.current]);
           return prev;
-        },
-        { reducedList: [] }
-      );
+        }
 
-      setTodoList(reducedList);
-    },
-    [todoList]
-  );
+        if (idx === over.current) {
+          prev.reducedList.push({ id: '123123123', text: '' });
+          return prev;
+        }
 
-  const insertSpace = useCallback(
+        prev.reducedList.push(cur);
+        return prev;
+      },
+      { reducedList: [] }
+    );
+
+    setDragList(reducedList);
+  }, [dragList]);
+
+  const handleOver = useCallback(
     (index) => {
-      console.log(`from ${startIndex.current} to ${index}`);
+      const indexInt = parseInt(index, 10);
 
-      if (index === startIndex.current || index === startIndex.current + 1) {
+      if (over.current === indexInt) {
         return;
       }
 
-      if (todoList[index].isSpace) {
-        return;
+      leave.current = over.current;
+      over.current = indexInt;
+
+      if (leave.current < 0) {
+        leave.current = over.current;
       }
 
-      const filtered = todoList.filter((todo) => !todo.isSpace);
-
-      const front = filtered.slice(0, index);
-      const back = filtered.slice(index);
-
-      console.log(filtered.length, todoList.length);
-      if (index < startIndex.current) {
-        startIndex.current += 1;
-      } else if (filtered.length < todoList.length) {
-        startIndex.current += 1;
-      }
-
-      setTodoList([...front, { id: '123123', text: '', isSpace: true }, ...back]);
+      setInDraggingList();
     },
-    [todoList]
+    [setInDraggingList]
   );
+
+  const handleDrop = useCallback(() => {
+    console.log(`from ${startIndex.current}, leave ${leave.current}, over ${over.current}`);
+
+    const mapped = dragList.map((cur) => {
+      if (cur.text === '') {
+        return listRef.current[startIndex.current];
+      }
+      return cur;
+    });
+
+    setDragList(mapped);
+    listRef.current = mapped;
+  }, [dragList]);
 
   const renderBox = useCallback(() => {
-    if (todoList.length === 0) {
+    if (dragList.length === 0) {
       return null;
     }
 
-    return todoList.map(({ id, text }, idx) => (
+    return dragList.map(({ id, text }, idx) => (
       <Box
         key={id}
         index={idx}
         value={text}
         onChange={setTodo}
-        onSwap={swapTodos}
-        onSpace={insertSpace}
         onStart={handleStart}
+        onOver={handleOver}
+        onDrop={handleDrop}
         onEnd={handleEnd}
       />
     ));
-  }, [todoList, setTodo, swapTodos, insertSpace, handleStart, handleEnd]);
+  }, [dragList, setTodo, handleStart, handleOver, handleDrop, handleEnd]);
 
   return (
     <Container>

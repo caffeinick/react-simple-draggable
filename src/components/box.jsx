@@ -1,19 +1,15 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
-
-const idPrefix = 'box-input-';
 
 const Box = ({
   index = 0,
   value = '',
   onChange = () => {},
-  onSwap = () => {},
-  onSpace = () => {},
   onStart = () => {},
   onEnd = () => {},
+  onOver = () => {},
+  onDrop = () => {},
 }) => {
-  const id = useRef('');
-
   // Input 값 변경됐을 때
   const handleChange = useCallback(
     (e) => {
@@ -25,7 +21,6 @@ const Box = ({
   // 드래그 시작됐을 때 발생 (source가 타겟)
   const handleDragStart = useCallback(
     (e) => {
-      e?.dataTransfer?.setData('index', index);
       onStart(index);
     },
     [onStart, index]
@@ -35,36 +30,25 @@ const Box = ({
   const handleDragOver = useCallback(
     (e) => {
       e.preventDefault();
-
-      if (id.current === e?.target?.id) {
-        return;
-      }
-
-      id.current = e?.target.id;
-      onSpace(index);
+      onOver(index);
     },
-    [index, onSpace]
+    [index, onOver]
   );
 
   // source가 dropped 됐을 때
   const handleDrop = useCallback(
     (e) => {
-      onSwap(index);
-      onEnd(index);
+      onDrop(index);
+      onEnd();
     },
-    [index, onSwap, onEnd]
+    [index, onDrop, onEnd]
   );
-
-  // source가 닿았다가 떠났을 때
-  const handleDragLeave = useCallback((e) => {
-    id.current = '';
-  }, []);
 
   return (
     <BoxContainer>
       <BoxInput
         type={'input'}
-        id={`${idPrefix}${index}`}
+        id={`box-input-${index}`}
         value={value}
         onChange={handleChange}
         autoComplete={'off'}
@@ -72,7 +56,6 @@ const Box = ({
         onDragStart={handleDragStart}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
       />
     </BoxContainer>
   );
