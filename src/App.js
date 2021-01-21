@@ -32,7 +32,11 @@ function App() {
   const [todoList, setTodoList] = useState(todoTest);
 
   const handleCreate = useCallback(() => {
-    setTodoList([...todoList, { id: uuidv4(), text: ' ' }]);
+    const lastOne = todoList[todoList.length - 1];
+
+    if (lastOne?.text?.trim() !== '') {
+      setTodoList([...todoList, { id: uuidv4(), text: ' ' }]);
+    }
   }, [todoList]);
 
   return (

@@ -69,7 +69,9 @@ const Box = forwardRef(
     const handleKeyDown = useCallback(
       (e) => {
         if (e.code === 'Enter') {
-          onCreate(index);
+          if (e?.target?.value?.trim() !== '') {
+            onCreate(index);
+          }
         }
       },
       [index, onCreate]
