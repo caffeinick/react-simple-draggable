@@ -1,17 +1,18 @@
-import { useState, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 import Box from './box';
 
-const Draggable = ({ list = [] }) => {
-  const [dragList, setDragList] = useState(list);
-
-  const listRef = useRef(list);
+const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => {
+  const listRef = useRef(dragList);
   const startIndex = useRef(-1); // 시작한 인덱스 저장
   const leave = useRef(-1);
   const over = useRef(-1);
 
-  const setTodo = useCallback(
+  const boxRefs = useRef([]);
+
+  const setItem = useCallback(
     (value, index) => {
       const mapped = dragList.map((val, idx) =>
         idx !== index ? val : { id: val.id, text: value }
@@ -20,7 +21,20 @@ const Draggable = ({ list = [] }) => {
       setDragList(mapped);
       listRef.current = mapped;
     },
-    [dragList]
+    [dragList, setDragList]
+  );
+
+  const createItem = useCallback(
+    (index) => {
+      console.log(boxRefs.current);
+
+      setDragList(dragList.concat({ id: uuidv4(), text: ' ' }));
+
+      setTimeout(() => {
+        boxRefs.current[index + 1]?.focus();
+      });
+    },
+    [dragList, setDragList]
   );
 
   const handleDragStart = useCallback((index) => {
@@ -47,7 +61,7 @@ const Draggable = ({ list = [] }) => {
     );
 
     setDragList(reducedList);
-  }, [dragList]);
+  }, [dragList, setDragList]);
 
   const handleDragOver = useCallback(
     (index) => {
@@ -97,6 +111,10 @@ const Draggable = ({ list = [] }) => {
     over.current = -1;
   }, []);
 
+  const handleRef = (ref, index) => {
+    boxRefs.current[index] = ref;
+  };
+
   const renderBox = useCallback(() => {
     if (dragList.length === 0) {
       return null;
@@ -104,10 +122,12 @@ const Draggable = ({ list = [] }) => {
 
     return dragList.map(({ id, text }, idx) => (
       <Box
+        ref={(ref) => handleRef(ref, idx)}
         key={id}
         index={idx}
         value={text}
-        onChange={setTodo}
+        onChange={setItem}
+        onCreate={createItem}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -117,7 +137,8 @@ const Draggable = ({ list = [] }) => {
     ));
   }, [
     dragList,
-    setTodo,
+    setItem,
+    createItem,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
