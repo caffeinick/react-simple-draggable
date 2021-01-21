@@ -30,7 +30,6 @@ const HeaderLeft = styled.div`
   height: 50px;
   text-align: center;
   font-size: 25px;
-  // background-color: red;
 `;
 
 const HeaderRight = styled.div`
@@ -38,14 +37,12 @@ const HeaderRight = styled.div`
   height: 50px;
   text-align: center;
   font-size: 25px;
-  // background-color: green;
 `;
 
 const Title = styled.div`
   width: 100px;
   text-align: center;
   font-size: 25px;
-  // background-color: blue;
 `;
 
 const HeaderButton = styled.button`

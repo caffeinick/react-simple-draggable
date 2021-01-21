@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Box from './box';
 
 const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => {
-  const listRef = useRef(dragList);
   const startIndex = useRef(-1); // 시작한 인덱스 저장
   const leave = useRef(-1);
   const over = useRef(-1);
@@ -19,7 +18,6 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
       );
 
       setDragList(mapped);
-      listRef.current = mapped;
     },
     [dragList, setDragList]
   );
@@ -92,16 +90,6 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
 
   const handleDrop = useCallback(() => {
     // console.log(`from ${startIndex.current}, leave ${leave.current}, over ${over.current}`);
-    // 부모 벗어나면 버그 발생
-    // const mapped = dragList.map((cur) => {
-    //   if (cur.text === '') {
-    //     return listRef.current[startIndex.current];
-    //   }
-    //   return cur;
-    // });
-    // setDragList(mapped);
-    // listRef.current = mapped;
-    // }, [dragList]);
   }, []);
 
   const handleDragEnd = useCallback(
