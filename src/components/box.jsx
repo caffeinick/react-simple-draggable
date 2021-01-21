@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 
 const Box = ({
@@ -11,6 +11,8 @@ const Box = ({
   onDrop = () => {},
   onReset = () => {},
 }) => {
+  const [dragging, setDragging] = useState(false);
+
   // Input 값 변경됐을 때
   const handleChange = useCallback(
     (e) => {
@@ -23,6 +25,8 @@ const Box = ({
   const handleDragStart = useCallback(
     (e) => {
       onDragStart(index);
+
+      setDragging(true);
     },
     [onDragStart, index]
   );
@@ -51,6 +55,8 @@ const Box = ({
       e.preventDefault();
       onDragEnd(e);
       onReset();
+
+      setDragging(false);
     },
     [onDragEnd, onReset]
   );
@@ -64,7 +70,13 @@ const Box = ({
       onDragEnd={handleDragEnd}
       onDrop={handleDrop}
     >
-      <BoxInput type={'input'} value={value} onChange={handleChange} autoComplete={'off'} />
+      <BoxInput
+        type={'input'}
+        value={value}
+        onChange={handleChange}
+        autoComplete={'off'}
+        disabled={dragging}
+      />
     </BoxContainer>
   );
 };
