@@ -37,6 +37,13 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
     [dragList, setDragList]
   );
 
+  const deleteItem = useCallback(
+    (index) => {
+      setDragList(dragList.filter((v, idx) => idx !== index));
+    },
+    [dragList, setDragList]
+  );
+
   const handleDragStart = useCallback((index) => {
     startIndex.current = index;
   }, []);
@@ -128,6 +135,7 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
         value={text}
         onChange={setItem}
         onCreate={createItem}
+        onDelete={deleteItem}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -139,6 +147,7 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
     dragList,
     setItem,
     createItem,
+    deleteItem,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
@@ -152,7 +161,8 @@ const Draggable = ({ list: dragList = [], setList: setDragList = () => {} }) => 
 export default Draggable;
 
 const DraggableContainer = styled.div`
-  height: 100%;
+  overflow: auto;
+  height: 95%;
   padding: 20px;
   background-color: rgb(245, 223, 77);
 `;

@@ -8,6 +8,7 @@ const Box = forwardRef(
       value = '',
       onChange = () => {},
       onCreate = () => {},
+      onDelete = () => {},
       onDragStart = () => {},
       onDragOver = () => {},
       onDragEnd = () => {},
@@ -77,6 +78,10 @@ const Box = forwardRef(
       [index, onCreate]
     );
 
+    const handleButtonClick = useCallback(() => {
+      onDelete(index);
+    }, [index, onDelete]);
+
     return (
       <BoxContainer
         id={`box-input-${index}`}
@@ -95,6 +100,9 @@ const Box = forwardRef(
           disabled={dragging}
           onKeyDown={handleKeyDown}
         />
+        <BoxButtonDelete type="button" onClick={handleButtonClick}>
+          -
+        </BoxButtonDelete>
       </BoxContainer>
     );
   }
@@ -105,6 +113,7 @@ export default Box;
 const BoxContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-around;
   height: 50px;
   padding: 0 10px;
   border: 1px solid white;
@@ -117,4 +126,9 @@ const BoxInput = styled.input`
   border: 0;
   background-color: white;
   width: 90%;
+`;
+
+const BoxButtonDelete = styled.button`
+  width: 30px;
+  height: 30px;
 `;
