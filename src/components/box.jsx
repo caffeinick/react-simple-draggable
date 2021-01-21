@@ -1,5 +1,5 @@
 import { useState, useCallback, forwardRef } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const Box = forwardRef(
   (
@@ -95,6 +95,7 @@ const Box = forwardRef(
           ref={ref}
           type={'input'}
           value={value}
+          dragging={dragging}
           onChange={handleChange}
           autoComplete={'off'}
           disabled={dragging}
@@ -115,9 +116,11 @@ const BoxContainer = styled.div`
   align-items: center;
   justify-content: space-around;
   height: 50px;
+  margin-bottom: 3px;
   padding: 0 10px;
-  border: 1px solid white;
-  background-color: rgb(147, 149, 151);
+  border: 2px solid white;
+  border-radius: 4px;
+  background-color: white;
   color: white;
 `;
 
@@ -126,9 +129,19 @@ const BoxInput = styled.input`
   border: 0;
   background-color: white;
   width: 90%;
+  &:hover {
+    cursor: move;
+  }
+  ${({ dragging }) =>
+    dragging
+      ? css`
+          cursor: move;
+        `
+      : ''}
 `;
 
 const BoxButtonDelete = styled.button`
+  font-size: 20px;
   width: 30px;
   height: 30px;
 `;

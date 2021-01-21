@@ -49,6 +49,7 @@ const Title = styled.div`
 `;
 
 const HeaderButton = styled.button`
+  font-size: 20px;
   width: 50px;
   height: 50px;
 `;
