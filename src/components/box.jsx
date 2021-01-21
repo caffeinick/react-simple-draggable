@@ -56,19 +56,15 @@ const Box = ({
   );
 
   return (
-    <BoxContainer>
-      <BoxInput
-        type={'input'}
-        id={`box-input-${index}`}
-        value={value}
-        onChange={handleChange}
-        autoComplete={'off'}
-        draggable={true}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-        onDrop={handleDrop}
-      />
+    <BoxContainer
+      id={`box-input-${index}`}
+      draggable={true}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      onDrop={handleDrop}
+    >
+      <BoxInput type={'input'} value={value} onChange={handleChange} autoComplete={'off'} />
     </BoxContainer>
   );
 };
